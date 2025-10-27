@@ -20,11 +20,23 @@ CUDA_SOURCES += $$SOURCEDIR/cuda_code.cu \
 #-gencode=arch=compute_86,code=compute_86
 
 ##use this for maximum compatibility with CUDA 12.8
-CUDA_ARCH += sm_52 \
--gencode=arch=compute_52,code=sm_52 \
--gencode=arch=compute_60,code=sm_60 \
--gencode=arch=compute_61,code=sm_61 \
--gencode=arch=compute_70,code=sm_70 \
+#CUDA_ARCH += sm_52 \
+#-gencode=arch=compute_52,code=sm_52 \
+#-gencode=arch=compute_60,code=sm_60 \
+#-gencode=arch=compute_61,code=sm_61 \
+#-gencode=arch=compute_70,code=sm_70 \
+#-gencode=arch=compute_75,code=sm_75 \
+#-gencode=arch=compute_80,code=sm_80 \
+#-gencode=arch=compute_86,code=sm_86 \
+#-gencode=arch=compute_87,code=sm_87 \
+#-gencode=arch=compute_89,code=sm_89 \
+#-gencode=arch=compute_90,code=sm_90 \
+#-gencode=arch=compute_100,code=sm_100 \
+#-gencode=arch=compute_120,code=sm_120 \
+#-gencode=arch=compute_120,code=compute_120
+
+##use this for CUDA 13.0
+CUDA_ARCH += sm_75 \
 -gencode=arch=compute_75,code=sm_75 \
 -gencode=arch=compute_80,code=sm_80 \
 -gencode=arch=compute_86,code=sm_86 \

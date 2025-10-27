@@ -1,5 +1,4 @@
 #include "gpuinfo.h"
-#include <cuda_runtime.h>
 
 GpuInfo::GpuInfo(QObject* parent) : QObject(parent)
 {
@@ -50,9 +49,7 @@ QVector<GpuDeviceInfo> GpuInfo::getAllDevices() {
 		info.regsPerMultiprocessor = prop.regsPerMultiprocessor;
 		info.l2CacheSize = prop.l2CacheSize;
 		info.multiProcessorCount = prop.multiProcessorCount;
-		info.clockRate = prop.clockRate;
 		info.memoryBusWidth = prop.memoryBusWidth;
-		info.memoryClockRate = prop.memoryClockRate;
 		info.warpSize = prop.warpSize;
 		info.maxThreadsPerBlock = prop.maxThreadsPerBlock;
 		info.maxThreadsPerMultiprocessor = prop.maxThreadsPerMultiProcessor;
@@ -66,8 +63,36 @@ QVector<GpuDeviceInfo> GpuInfo::getAllDevices() {
 		info.canMapHostMemory = prop.canMapHostMemory;
 		info.asyncEngineCount = prop.asyncEngineCount;
 
+//some fields are deprecated/removed in cuda 13 --> fetch via attributes when cuda 13+ is used.
+#if defined(CUDART_VERSION) && (CUDART_VERSION >= 13000)
+		info.clockRate = -1;
+		info.memoryClockRate = -1;
+		int value = 0;
+		if(getAttr(i, cudaDevAttrClockRate, value)) {
+			info.clockRate = value;
+		}
+		if(getAttr(i, cudaDevAttrMemoryClockRate, value)) {
+			info.memoryClockRate = value;
+		}
+#else
+		info.clockRate = prop.clockRate;
+		info.memoryClockRate = prop.memoryClockRate;
+#endif
+
 		devices.append(info);
 	}
 
 	return devices;
+}
+
+bool GpuInfo::getAttr(int device, cudaDeviceAttr attr, int &out) {
+	cudaError_t err = cudaDeviceGetAttribute(&out, attr, device);
+	if (err != cudaSuccess) {
+		emit error(QString("CUDA attribute query failed (%1) on device %2: %3")
+			.arg(static_cast<int>(attr))
+			.arg(device)
+			.arg(cudaGetErrorString(err)));
+		return false;
+	}
+	return true;
 }

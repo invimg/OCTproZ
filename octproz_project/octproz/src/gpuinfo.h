@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QVector>
+#include <cuda_runtime.h>
 
 struct GpuDeviceInfo {
 	int deviceId;
@@ -47,6 +48,9 @@ public:
 
 	QVector<GpuDeviceInfo> getAllDevices();
 	bool isCudaAvailable();
+
+private:
+	bool getAttr(int device, cudaDeviceAttr attr, int &out);
 
 signals:
 	void info(QString infoMessage);
